@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ApiCuentas.Api/ApiCuentas.Api.csproj" />
+    <Project Path="src/ApiCuentas.Application/ApiCuentas.Application.csproj" />
+    <Project Path="src/ApiCuentas.Domain/ApiCuentas.Domain.csproj" />
+    <Project Path="src/ApiCuentas.Infrastructure/ApiCuentas.Infrastructure.csproj" />
+  </Folder>
+</Solution>
