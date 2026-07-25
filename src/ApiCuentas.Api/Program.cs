@@ -1,5 +1,4 @@
-using ApiCuentas.Application.Interfaces;
-using ApiCuentas.Infrastructure.Repositories;
+using ApiCuentas.Infrastructure;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,10 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-// Inyección de dependencias
-builder.Services.AddSingleton<ICuentaRepository, CuentaRepositoryMemoria>();
+// Registra DbContext + Repositorios de Infrastructure (lee la cadena de conexión de appsettings.json)
+builder.Services.AddInfrastructure(builder.Configuration);
 
-// Registro de MediatR: escanea el ensamblado de Application buscando todos los Handlers
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(ApiCuentas.Application.Cuentas.Commands.CrearCuenta.CrearCuentaCommand).Assembly));
 

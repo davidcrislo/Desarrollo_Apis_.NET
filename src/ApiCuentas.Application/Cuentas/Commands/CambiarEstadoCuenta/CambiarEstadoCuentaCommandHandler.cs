@@ -31,6 +31,8 @@ namespace ApiCuentas.Application.Cuentas.Commands.CambiarEstadoCuenta
 
             cuenta.FechaActualizacion = DateTime.UtcNow;
 
+            _repositorio.Actualizar(cuenta);
+
             return Task.FromResult(new ResultadoCambiarEstado { Cuenta = cuenta });
         }
     }

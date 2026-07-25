@@ -7,6 +7,7 @@ namespace ApiCuentas.Application.Interfaces
         IEnumerable<Cuenta> Listar(EstadoCuenta? estado);
         Cuenta? ObtenerPorId(string idCuenta);
         void Agregar(Cuenta cuenta);
+        void Actualizar(Cuenta cuenta);
         bool Existe(string idCuenta);
     }
 }
