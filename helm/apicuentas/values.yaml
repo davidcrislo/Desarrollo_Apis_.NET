@@ -4,9 +4,9 @@ nameOverride: ""
 fullnameOverride: ""
 
 image:
-  repository: docker.io/davidcislo/accounts-api
+  repository: davidcislo/accounts-api
   tag: latest
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 containerPort: 8080
 
@@ -23,6 +23,10 @@ postgres:
   password: postgres
   image: postgres:16
   storage: 1Gi
+
+# URL del servidor Seq -> ConfigMap (no es sensible, va como el resto de config no sensible)
+seq:
+  serverUrl: "http://seq:5341"
 
 service:
   type: NodePort
