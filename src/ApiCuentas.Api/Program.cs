@@ -5,6 +5,8 @@ using ApiCuentas.Infrastructure.Persistence;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -23,7 +25,6 @@ try
     {
         var applicationName = context.Configuration["APPLICATION_NAME"] ?? "ApiCuentas.Api";
         var seqUrl = context.Configuration["Seq:ServerUrl"] ?? "http://localhost:5341";
-
         loggerConfiguration
             .ReadFrom.Configuration(context.Configuration)
             .Enrich.FromLogContext()
@@ -53,6 +54,14 @@ try
     // el ValidationBehavior corre el Validator correspondiente y, si falla, tira ValidationException.
     builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
+    // Health checks: "/health/live" confirma que el proceso está vivo (sin dependencias externas).
+    // "/health/ready" además valida que la conexión a Postgres esté disponible (tag "ready").
+    builder.Services.AddHealthChecks()
+        .AddDbContextCheck<AppDbContext>(
+            name: "postgresql",
+            failureStatus: HealthStatus.Unhealthy,
+            tags: new[] { "ready" });
+
     var app = builder.Build();
 
     // Aplica migraciones pendientes de EF Core contra la base configurada.
@@ -73,14 +82,25 @@ try
     // estructurada, con placeholders con nombre para que Seq pueda indexar y filtrar.
     app.UseSerilogRequestLogging();
 
-
     // Middleware de Serilog: loguea cada request HTTP (método, path, status code, duración)
     // de forma estructurada automáticamente, sin tener que escribirlo a mano por endpoint.
     app.UseValidationExceptionHandling();
 
     app.UseHttpsRedirection();
     app.UseAuthorization();
+
     app.MapControllers();
+
+    app.MapHealthChecks("/health/live", new HealthCheckOptions
+    {
+        Predicate = _ => false
+    });
+
+    app.MapHealthChecks("/health/ready", new HealthCheckOptions
+    {
+        Predicate = healthCheck => healthCheck.Tags.Contains("ready")
+    });
+
     app.Run();
 }
 catch (Exception ex)

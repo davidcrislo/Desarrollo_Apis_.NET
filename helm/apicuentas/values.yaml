@@ -40,7 +40,8 @@ waitForPostgres:
   image: postgres:16
 
 probes:
-  path: /api/v1/cuentas
+  readinessPath: /health/ready
+  livenessPath: /health/live
   readiness:
     initialDelaySeconds: 10
     periodSeconds: 10
